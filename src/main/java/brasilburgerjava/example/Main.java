@@ -10,7 +10,7 @@ public class Main {
         
 
         BurgerVue burgerVue = new BurgerVue(scanner);
-       
+        ComplementVue complementVue = new ComplementVue(scanner);
         
         System.out.println("=========================================");
         System.out.println("    BRASIL BURGER - GESTIONNAIRE");
@@ -32,7 +32,7 @@ public class Main {
                         break;
                         
                     case 2: 
-                        //gererComplements(scanner, complementVue);
+                        gererComplements(scanner, complementVue);
                         break;
                         
                     case 3: 
@@ -110,5 +110,44 @@ public class Main {
             }
         }
     }
+
+    private static void gererComplements(Scanner scanner, ComplementVue complementVue) {
+        boolean retour = false;
+       
+        while (!retour) {
+            System.out.println("\n=== GESTION DES COMPLÉMENTS ===");
+            System.out.println("1.Créer un complément");
+            System.out.println("2.Lister tous les compléments");
+            System.out.println("3.Lister par type");
+            System.out.println("4.Retour");
+           
+            System.out.print("Votre choix: ");
+            String choixStr = scanner.nextLine();
+           
+            try {
+                int choix = Integer.parseInt(choixStr);
+               
+                switch (choix) {
+                    case 1:
+                        complementVue.creerComplement();
+                        break;
+                    case 2:
+                        complementVue.listerComplements();
+                        break;
+                    case 3:
+                        complementVue.listerComplementsParType();
+                        break;
+                    case 4:
+                        retour = true;
+                        break;
+                    default:
+                        System.out.println("Choix invalide !");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Veuillez entrer un nombre valide !");
+            }
+        }
+    }
+
    
 }
