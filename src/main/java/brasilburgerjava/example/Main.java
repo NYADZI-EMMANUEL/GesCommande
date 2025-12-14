@@ -11,6 +11,7 @@ public class Main {
 
         BurgerVue burgerVue = new BurgerVue(scanner);
         ComplementVue complementVue = new ComplementVue(scanner);
+        MenuVue menuVue = new MenuVue(scanner);
         
         System.out.println("=========================================");
         System.out.println("    BRASIL BURGER - GESTIONNAIRE");
@@ -36,7 +37,7 @@ public class Main {
                         break;
                         
                     case 3: 
-                        //gererMenus(scanner, menuVue);
+                        gererMenus(scanner, menuVue);
                         break;
                         
                     case 4: 
@@ -138,6 +139,40 @@ public class Main {
                         complementVue.listerComplementsParType();
                         break;
                     case 4:
+                        retour = true;
+                        break;
+                    default:
+                        System.out.println("Choix invalide !");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Veuillez entrer un nombre valide !");
+            }
+        }
+    }
+
+    private static void gererMenus(Scanner scanner, MenuVue menuVue) {
+        boolean retour = false;
+       
+        while (!retour) {
+            System.out.println("\n=== GESTION DES MENUS ===");
+            System.out.println("1.Créer un menu");
+            System.out.println("2.Lister tous les menus");
+            System.out.println("3.Retour");
+           
+            System.out.print("Votre choix: ");
+            String choixStr = scanner.nextLine();
+           
+            try {
+                int choix = Integer.parseInt(choixStr);
+               
+                switch (choix) {
+                    case 1:
+                        menuVue.creerMenu();
+                        break;
+                    case 2:
+                        menuVue.listerMenus();
+                        break;
+                    case 3:
                         retour = true;
                         break;
                     default:
