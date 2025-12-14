@@ -12,6 +12,8 @@ public class Main {
         BurgerVue burgerVue = new BurgerVue(scanner);
         ComplementVue complementVue = new ComplementVue(scanner);
         MenuVue menuVue = new MenuVue(scanner);
+        ZoneVue zoneVue = new ZoneVue(scanner);
+        LivreurVue livreurVue = new LivreurVue(scanner);
         
         System.out.println("=========================================");
         System.out.println("    BRASIL BURGER - GESTIONNAIRE");
@@ -41,11 +43,11 @@ public class Main {
                         break;
                         
                     case 4: 
-                        //gererZones(scanner, zoneVue);
+                        gererZones(scanner, zoneVue);
                         break;
                         
                     case 5: 
-                        //gererLivreurs(scanner, livreurVue);
+                        gererLivreurs(scanner, livreurVue);
                         break;
                         
                     case 6: 
@@ -183,6 +185,92 @@ public class Main {
             }
         }
     }
+
+     
+        
+        
+
+
+ 
+       
+       
+    private static void gererZones(Scanner scanner, ZoneVue zoneVue) {
+        boolean retour = false;
+       
+        while (!retour) {
+            System.out.println("\n=== GESTION DES ZONES ===");
+            System.out.println("1.Créer une zone");
+            System.out.println("2.Lister toutes les zones");
+            System.out.println("3.Voir une zone");
+            System.out.println("4.Retour");
+           
+            System.out.print("Votre choix: ");
+            String choixStr = scanner.nextLine();
+           
+            try {
+                int choix = Integer.parseInt(choixStr);
+               
+                switch (choix) {
+                    case 1:
+                        zoneVue.creerZone();
+                        break;
+                    case 2:
+                        zoneVue.listerZones();
+                        break;
+                    case 3:
+                        zoneVue.voirZone();
+                        break;
+                    case 4:
+                        retour = true;
+                        break;
+                    default:
+                        System.out.println("Choix invalide !");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Veuillez entrer un nombre valide !");
+            }
+        }
+    }
+   
+    private static void gererLivreurs(Scanner scanner, LivreurVue livreurVue) {
+        boolean retour = false;
+       
+        while (!retour) {
+            System.out.println("\n=== GESTION DES LIVREURS ===");
+            System.out.println("1.Créer un livreur");
+            System.out.println("2.Lister tous les livreurs");
+            System.out.println("3.Voir un livreur");
+            System.out.println("4.Retour");
+           
+            System.out.print("Votre choix: ");
+            String choixStr = scanner.nextLine();
+           
+            try {
+                int choix = Integer.parseInt(choixStr);
+               
+                switch (choix) {
+                    case 1:
+                        livreurVue.creerLivreur();
+                        break;
+                    case 2:
+                        livreurVue.listerLivreurs();
+                        break;
+                    case 3:
+                        livreurVue.voirLivreur();
+                        break;
+                    case 4:
+                        retour = true;
+                        break;
+                    default:
+                        System.out.println("Choix invalide !");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Veuillez entrer un nombre valide !");
+            }
+        }
+    }
+
+
 
    
 }
