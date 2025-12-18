@@ -1,7 +1,6 @@
 var builder = WebApplication.CreateBuilder(args);
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080"; // 8080 par défaut localement
-builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
