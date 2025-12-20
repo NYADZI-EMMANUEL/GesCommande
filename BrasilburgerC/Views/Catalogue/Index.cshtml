@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Catalogue";
 }
-<div class="d-flex" style="gap:5%;">
+@* <div class="d-flex" style="gap:5%;">
     
         <div class="bg-warning text-white " style="height: 100%; width: 15%; position: fixed; top: 0; left: 0;padding-left:10px; padding-top:10px;padding-bottom:10px;padding-right:0;background: linear-gradient(180deg, #FFA629 0%, #000000 100%); ">
             <div class="text-center mb-4">
@@ -29,7 +29,6 @@
         <div class="flex-grow-1 p-4 " style="width: 80%; margin-left:17%; margin-top:20px;">
             <h2 class="mb-4">Catalogue</h2>
 
-            <!-- Hero Banner -->
             <div class="card border-0 shadow-sm mb-4" style="background-image: url('https://res.cloudinary.com/dx2imkeka/image/upload/v1766203929/fond_accueil_ezrujf.png'); background-size: cover; background-position: center; padding: 10px;">
                 <div class="card-body p-5">
                     <div class="row align-items-center">
@@ -38,7 +37,7 @@
                             <h3 class="fw-bold text-white" style="font-style: italic;">Brasil burger</h3>
                             <p class="mb-0 text-white">Des saveurs authentiques du Brésil dans chaque bouchée</p>
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
@@ -93,4 +92,108 @@
             }
         </div>
     </div>
-</div>
+</div> *@
+
+<div class="d-flex" style="gap:5%;">
+        <!-- Sidebar -->
+        <div class="bg-warning text-white" style="height: 100%; width: 15%; position: fixed; top: 0; left: 0;padding-left:10px; padding-top:10px;padding-bottom:10px;padding-right:0;background: linear-gradient(180deg, #FFA629 0%, #000000 100%);">
+            <div class="text-center mb-4">
+                <img src="https://res.cloudinary.com/dx2imkeka/image/upload/v1766200802/logo_brasil_burger_1_atsto9.png" alt="Logo" class="rounded-circle mb-3">
+            </div>
+            
+            <nav class="nav flex-column">
+                <a class="nav-link text-white bg-dark mb-2" asp-controller="Catalogue" asp-action="Index" style="border-radius: 20px 0 0 20px; padding-left:10px; padding-top:10px; padding-bottom:10px; padding-right:0;">
+                    <span><i class="bi bi-newspaper text-white"></i></span> Catalogue
+                </a>
+                <a class="nav-link text-white p-3" asp-controller="Panier" asp-action="Index">
+                    <span><i class="bi bi-bag-fill text-white"></i></span> Panier
+                </a>
+                <a class="nav-link text-white p-3" asp-controller="Commande" asp-action="Index">
+                    <span><i class="bi bi-clipboard-fill text-white"></i></span> Commades
+                </a>
+                <a class="nav-link text-white p-3" href="#">
+                    <span><i class="bi bi-person-fill text-white"></i></span> @ViewBag.UserPrenom @ViewBag.UserNom
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-grow-1 p-4" style="width: 80%; margin-left:17%; margin-top:20px;">
+            <h2 class="mb-4">Catalogue</h2>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- Hero Banner -->
+            <div class="card border-0 shadow-sm mb-4" style="background-image: url('https://res.cloudinary.com/dx2imkeka/image/upload/v1766203929/fond_accueil_ezrujf.png'); background-size: cover; background-position: center; padding: 10px;">
+                <div class="card-body p-5">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <span class="badge bg-warning text-dark mb-2">NOUVEAU</span>
+                            <h3 class="fw-bold text-white" style="font-style: italic;">Brasil burger</h3>
+                            <p class="mb-0 text-white">Des saveurs authentiques du Brésil dans chaque bouchée</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Title + Filter -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4>Nos burgers, menus et compléments</h4>
+                
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Filtrer par menu ou burger
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" asp-action="Index" asp-route-filter="tous">Tous</a></li>
+                        <li><a class="dropdown-item" asp-action="Index" asp-route-filter="burger">Burgers</a></li>
+                        <li><a class="dropdown-item" asp-action="Index" asp-route-filter="menu">Menus</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="row g-4">
+                @foreach (dynamic product in Model)
+                {
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <img src="@product.Image" class="card-img-top" alt="@product.Nom" style="height: 200px; object-fit: cover; padding:5px;">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0">@product.Nom</h6>
+                                    <a asp-action="Details" asp-route-type="@product.Type" asp-route-id="@product.Id" class="text-success">
+                                        <i class="bi bi-eye-fill text-success"></i>
+                                    </a>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-warning fw-bold">@product.Prix fcfa</span>
+                                    <form method="post" asp-controller="Panier" asp-action="AjouterProduit" class="d-inline">
+                                        <input type="hidden" name="type" value="@product.Type" />
+                                        <input type="hidden" name="id" value="@product.Id" />
+                                        <input type="hidden" name="quantite" value="1" />
+                                        <button type="submit" class="btn btn-warning btn-sm rounded-circle">
+                                            <span class="text-white fs-5">+</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @if (Model.Count == 0)
+            {
+                <div class="alert alert-info text-center mt-5">
+                    Aucun produit disponible pour le moment.
+                </div>
+            }
+        </div>
+    </div>

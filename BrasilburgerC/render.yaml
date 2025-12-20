@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: monappmvc
+    env: docker
+    region: frankfurt
+    plan: free
+    branch: deploy-production  # Remplacez par VOTRE nom de branche
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production

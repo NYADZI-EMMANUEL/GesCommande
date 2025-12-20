@@ -1,0 +1,115 @@
+@model dynamic
+@{
+    ViewData["Title"] = "Details produit";
+    var productType = ViewBag.ProductType as string;
+}
+<div class="d-flex" style="gap:5%;">
+         <div class="bg-warning text-white " style="height: 100%; width: 15%; position: fixed; top: 0; left: 0;padding-left:10px; padding-top:10px;padding-bottom:10px;padding-right:0;background: linear-gradient(180deg, #FFA629 0%, #000000 100%); ">
+            <div class="text-center mb-4">
+                <img src="https://res.cloudinary.com/dx2imkeka/image/upload/v1766200802/logo_brasil_burger_1_atsto9.png" alt="Logo" class="rounded-circle mb-3">
+            </div>
+            
+            <nav class="nav flex-column">
+                <a class="nav-link text-white bg-dark mb-2 " asp-controller="Catalogue" asp-action="Index" style="border-radius: 20px 0 0 20px; padding-left:10px; padding-top:10px; padding-bottom:10px; padding-right:0;">
+                    <span><i class="bi bi-newspaper text-white"></i></span> Catalogue
+                </a>
+                <a class="nav-link text-white p-3" asp-controller="Panier" asp-action="Index">
+                    <span><i class="bi bi-bag-fill text-white"></i></span> Panier
+                </a>
+                <a class="nav-link text-white p-3" asp-controller="Commande" asp-action="Index">
+                    <span><i class="bi bi-clipboard-fill text-white"></i></span> Commades
+                </a>
+                <a class="nav-link text-white p-3" href="#">
+                    <span><i class="bi bi-person-fill text-white"></i></span> @ViewBag.UserPrenom @ViewBag.UserNom
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-grow-1 p-4" style="width: 80%; margin-left:17%; margin-top:20px;">
+            <div class="mb-4">
+                <a asp-action="Index" class="text-decoration-none d-flex gap-2 text-dark">
+                    <i class="bi bi-arrow-left"></i> <span class="fw-bold"><h2 class="mb-4">Deatils produit</h2></span>
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-5">
+                    <div class="row">
+                        <!-- Image -->
+                        <div class="col-md-5">
+                            <img src="@Model.Image" alt="@Model.Nom" class="img-fluid rounded" style="max-height: 400px; object-fit: cover;">
+                        </div>
+
+                        <!-- Details -->
+                        <div class="col-md-7">
+                            <div class="mb-3 d-flex  gap-2" >
+                                <label class="text-muted mb-1">Nom:</label>
+                                <h4 class="fw-bold">@Model.Nom</h4>
+                            </div>
+
+                            <div class="mb-4 d-flex gap-2">
+                                <label class="text-muted mb-1">Prix:</label>
+                                <h5 class="text-warning fw-bold">@Model.Prix fcfa</h5>
+                            </div>
+
+                            @if (productType?.ToLower() == "burger")
+                            {
+                                <div class="mb-4">
+                                    <label class="text-muted mb-2">Description:</label>
+                                    <p class="text-secondary">
+                                        @(Model.Description ?? "Aucune description disponible.")
+                                    </p>
+                                </div>
+                            }
+                            else if (productType?.ToLower() == "menu")
+                            {
+                                <div class="mb-4">
+                                    <label class="text-muted mb-2">Composition du menu:</label>
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-warning"></i> <strong>Burger:</strong> @Model.Burger?.Nom</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-warning"></i> <strong>Boisson:</strong> @Model.Boisson?.Nom</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-warning"></i> <strong>Frites:</strong> @Model.Frite?.Nom</li>
+                                    </ul>
+                                </div>
+                            }
+                            else if (productType?.ToLower() == "complement")
+                            {
+                                <div class="mb-4">
+                                    <label class="text-muted mb-2">Type:</label>
+                                    <p class="text-secondary">@Model.Type</p>
+                                </div>
+                                
+                                @if (!string.IsNullOrEmpty(Model.Quantite))
+                                {
+                                    <div class="mb-4 d-flex gap-2">
+                                        <label class="text-muted mb-2">Quantité:</label>
+                                        <p class="text-secondary">@Model.Quantite</p>
+                                    </div>
+                                }
+                                
+                                @if (!string.IsNullOrEmpty(Model.Description))
+                                {
+                                    <div class="mb-4">
+                                        <label class="text-muted mb-2">Description:</label>
+                                        <p class="text-secondary">@Model.Description</p>
+                                    </div>
+                                }
+                            }
+
+                            <div class="mt-5">
+                                <form method="post" asp-controller="Panier" asp-action="AjouterProduit">
+                                    <input type="hidden" name="type" value="@ViewBag.ProductType" />
+                                    <input type="hidden" name="id" value="@ViewBag.ProductId" />
+                                    <input type="hidden" name="quantite" value="1" />
+                                    <button type="submit" class="btn btn-warning btn-lg text-white px-5">
+                                        <i class="bi bi-cart-plus"></i> Ajouter au panier
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

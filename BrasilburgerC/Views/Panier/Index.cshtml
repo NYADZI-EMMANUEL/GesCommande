@@ -1,0 +1,161 @@
+@model List<BrasilburgerC.Models.PanierItem>
+@{
+    ViewData["Title"] = "Panier";
+    var complements = ViewBag.Complements as List<BrasilburgerC.Models.Complement>;
+}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Brasil Burger</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="d-flex" style="gap:5%;">
+        <!-- Sidebar -->
+        <div class="bg-warning text-white" style="height: 100%; width: 15%; position: fixed; top: 0; left: 0;padding-left:10px; padding-top:10px;padding-bottom:10px;padding-right:0;background: linear-gradient(180deg, #FFA629 0%, #000000 100%);">
+            <div class="text-center mb-4">
+                <img src="https://res.cloudinary.com/dx2imkeka/image/upload/v1766200802/logo_brasil_burger_1_atsto9.png" alt="Logo" class="rounded-circle mb-3">
+            </div>
+            
+            <nav class="nav flex-column">
+                <a class="nav-link text-white mb-2" asp-controller="Catalogue" asp-action="Index" style="border-radius: 20px 0 0 20px; padding-left:10px; padding-top:10px; padding-bottom:10px; padding-right:0;">
+                    <span><i class="bi bi-newspaper text-white"></i></span> Catalogue
+                </a>
+                <a class="nav-link text-white bg-dark mb-2 p-3" asp-controller="Panier" asp-action="Index" style="border-radius: 20px 0 0 20px; padding-left:10px; padding-top:10px; padding-bottom:10px; padding-right:0;">
+                    <span><i class="bi bi-bag-fill text-white"></i></span> Panier
+                </a>
+                <a class="nav-link text-white p-3" asp-controller="Commande" asp-action="Index">
+                    <span><i class="bi bi-clipboard-fill text-white"></i></span> Commades
+                </a>
+                <a class="nav-link text-white p-3" href="#">
+                    <span><i class="bi bi-person-fill text-white"></i></span> @ViewBag.UserPrenom @ViewBag.UserNom
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-grow-1 p-4" style="width: 80%; margin-left:17%; margin-top:20px;">
+            <h2 class="mb-4">Panier</h2>
+
+            @if (Model.Count == 0)
+            {
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-cart-x fs-1"></i>
+                    <p class="mt-3">Votre panier est vide</p>
+                    <a asp-controller="Catalogue" asp-action="Index" class="btn btn-warning text-white">
+                        Voir le catalogue
+                    </a>
+                </div>
+            }
+            else
+            {
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show">
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        @foreach (var item in Model)
+                        {
+                            <div class="row mb-4 pb-4 border-bottom">
+                                <div class="col-md-2">
+                                    <img src="@item.Image" alt="@item.Nom" class="img-fluid rounded" style="height: 100px; object-fit: cover;">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <h5 class="fw-bold">@item.Nom</h5>
+                                    <p class="text-warning fw-bold mb-2">@item.Prix fcfa</p>
+
+                                    <!-- Quantité -->
+                                    <form method="post" asp-action="UpdateQuantite" class="d-inline">
+                                        <input type="hidden" name="panierItemId" value="@item.ProduitId" />
+                                        <div class="input-group" style="width: 120px;">
+                                            <button type="submit" name="quantite" value="@(item.Quantite - 1)" class="btn btn-outline-secondary btn-sm">-</button>
+                                            <input type="text" class="form-control form-control-sm text-center" value="@item.Quantite" readonly>
+                                            <button type="submit" name="quantite" value="@(item.Quantite + 1)" class="btn btn-outline-secondary btn-sm">+</button>
+                                        </div>
+                                    </form>
+
+                                    <!-- Dropdown Compléments -->
+                                    @if (item.Type == "Burger" || item.Type == "Menu")
+                                    {
+                                        <div class="mt-3">
+                                            <form method="post" asp-action="AjouterComplement" class="d-flex align-items-center gap-2">
+                                                <input type="hidden" name="panierItemId" value="@item.ProduitId" />
+                                                <select name="complementId" class="form-select form-select-sm" style="width: 200px;">
+                                                    <option selected disabled>Choisir complément</option>
+                                                    @foreach (var comp in complements ?? new List<BrasilburgerC.Models.Complement>())
+                                                    {
+                                                        <option value="@comp.Id">@comp.Nom - @comp.Prix fcfa</option>
+                                                    }
+                                                </select>
+                                                <button type="submit" class="btn btn-sm btn-warning text-white">Ajouter</button>
+                                            </form>
+                                        </div>
+
+                                        @if (item.Complements.Count > 0)
+                                        {
+                                            <div class="mt-2">
+                                                <small class="text-muted">Compléments ajoutés:</small>
+                                                <ul class="list-unstyled ms-3">
+                                                    @foreach (var comp in item.Complements)
+                                                    {
+                                                        <li class="small">• @comp.Nom (@comp.Quantite) - @comp.Prix fcfa</li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+
+                                <div class="col-md-3 text-end">
+                                    <p class="fw-bold fs-5 text-warning">@item.SousTotal fcfa</p>
+                                    <form method="post" asp-action="Supprimer">
+                                        <input type="hidden" name="panierItemId" value="@item.ProduitId" />
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Total -->
+                        <div class="row mt-4">
+                            <div class="col-md-12 text-end">
+                                <h4>Total : <span class="text-warning fw-bold">@ViewBag.Total fcfa</span></h4>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <form method="post" asp-action="Vider">
+                                    <button type="submit" class="btn btn-outline-danger">
+                                        <i class="bi bi-trash"></i> Vider le panier
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <a asp-controller="Commande" asp-action="Create" class="btn btn-warning btn-lg text-white px-5">
+                                    Commander <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

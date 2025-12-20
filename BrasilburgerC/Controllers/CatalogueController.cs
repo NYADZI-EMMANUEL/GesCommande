@@ -1,3 +1,5 @@
+// 
+
 using Microsoft.AspNetCore.Mvc;
 using BrasilburgerC.Services;
 
@@ -49,6 +51,7 @@ namespace BrasilburgerC.Controllers
             }
 
             ViewBag.ProductType = type;
+            ViewBag.ProductId = id;
             ViewBag.UserNom = HttpContext.Session.GetString("UserNom");
             ViewBag.UserPrenom = HttpContext.Session.GetString("UserPrenom");
 
