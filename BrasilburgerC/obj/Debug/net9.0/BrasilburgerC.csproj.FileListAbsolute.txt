@@ -84,8 +84,6 @@ D:\Examen Baila\BrasilburgerC\BrasilburgerC\obj\Debug\net9.0\compressed\v1n3bqhd
 D:\Examen Baila\BrasilburgerC\BrasilburgerC\obj\Debug\net9.0\compressed\nesuql2jk1-muycvpuwrr.gz
 D:\Examen Baila\BrasilburgerC\BrasilburgerC\obj\Debug\net9.0\compressed\0quk7z6n1d-87fc7y1x7t.gz
 D:\Examen Baila\BrasilburgerC\BrasilburgerC\obj\Debug\net9.0\compressed\r1q8e7av4e-mlv21k5csn.gz
-D:\Examen Baila\BrasilburgerC\BrasilburgerC\obj\Debug\net9.0\compressed\gbs4nyoqpo-go7n8iodkm.gz
-D:\Examen Baila\BrasilburgerC\BrasilburgerC\obj\Debug\net9.0\compressed\rwcf9ailm1-go7n8iodkm.gz
 D:\Examen Baila\BrasilburgerC\BrasilburgerC\obj\Debug\net9.0\staticwebassets.build.json
 D:\Examen Baila\BrasilburgerC\BrasilburgerC\obj\Debug\net9.0\staticwebassets.build.json.cache
 D:\Examen Baila\BrasilburgerC\BrasilburgerC\obj\Debug\net9.0\staticwebassets.development.json
@@ -185,3 +183,7 @@ D:\Examen Baila\BrasilburgerC\BrasilburgerC\bin\Debug\net9.0\zh-Hans\Microsoft.C
 D:\Examen Baila\BrasilburgerC\BrasilburgerC\bin\Debug\net9.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 D:\Examen Baila\BrasilburgerC\BrasilburgerC\obj\Debug\net9.0\BrasilburgerC.csproj.AssemblyReference.cache
 D:\Examen Baila\BrasilburgerC\BrasilburgerC\obj\Debug\net9.0\Brasilbu.11E7D54E.Up2Date
+D:\Examen Baila\BrasilburgerC\BrasilburgerC\bin\Debug\net9.0\Npgsql.dll
+D:\Examen Baila\BrasilburgerC\BrasilburgerC\bin\Debug\net9.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
+D:\Examen Baila\BrasilburgerC\BrasilburgerC\obj\Debug\net9.0\compressed\gbs4nyoqpo-pidya6pg9t.gz
+D:\Examen Baila\BrasilburgerC\BrasilburgerC\obj\Debug\net9.0\compressed\rwcf9ailm1-pidya6pg9t.gz

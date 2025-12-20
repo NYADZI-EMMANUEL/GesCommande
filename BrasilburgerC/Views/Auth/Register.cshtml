@@ -1,0 +1,83 @@
+@{
+    ViewData["Title"] = "Resgister";
+}
+
+
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100 py-5">
+            <div class="col-md-5 col-lg-4">
+                 <div class="text-center mb-4">
+                            <img src="https://res.cloudinary.com/dx2imkeka/image/upload/v1766200802/logo_brasil_burger_1_atsto9.png" alt="Brasil Burger" class="mb-3" style="width: 100px; height: 100px; border-radius: 50%;">
+                            <p class="text-muted mb-0">Créez votre compte</p>
+                        </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-5">
+                        @if (ViewBag.ErrorMessage != null)
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                @ViewBag.ErrorMessage
+                            </div>
+                        }
+
+                        <form method="post" asp-action="Register" asp-controller="Auth">
+                            <div class="mb-3">
+                                <label class="form-label text-secondary">Nom</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0">
+                                        <i class="bi bi-person-fill text-warning"></i>
+                                    </span>
+                                    <input type="text" class="form-control border-start-0 ps-0" name="nom" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-secondary">Prénom</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0">
+                                        <i class="bi bi-person-fill text-warning"></i>
+                                    </span>
+                                    <input type="text" class="form-control border-start-0 ps-0" name="prenom" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-secondary">Telephone</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0">
+                                        <i class="bi bi-telephone-fill text-warning"></i>
+                                    </span>
+                                    <input type="text" class="form-control border-start-0 ps-0" name="telephone" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-secondary">Mot de passe</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0">
+                                        <i class="bi bi-lock-fill text-warning"></i>
+                                    </span>
+                                    <input type="password" class="form-control border-start-0 ps-0" name="password" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label text-secondary">Confirmer le mot de passe</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0">
+                                        <i class="bi bi-lock-fill text-warning"></i>
+                                    </span>
+                                    <input type="password" class="form-control border-start-0 ps-0" name="confirmPassword" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-warning w-100 text-white fw-bold mb-3">
+                                S'inscrire
+                            </button>
+                        </form>
+                        <div class="text-center">
+                            <p class="text-muted mb-1">Vous avez déjà un compte ?</p>
+                            <a asp-action="Login" asp-controller="Auth" class="text-warning text-decoration-none fw-bold">
+                                Se connecter
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
