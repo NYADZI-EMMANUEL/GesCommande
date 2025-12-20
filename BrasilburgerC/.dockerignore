@@ -1,0 +1,13 @@
+# Créez un fichier .dockerignore
+echo "bin/
+obj/
+.git/
+.vs/
+*.user
+*.suo
+.vscode/
+Dockerfile*
+docker-compose*
+.env
+*.db
+*.log" > .dockerignore
