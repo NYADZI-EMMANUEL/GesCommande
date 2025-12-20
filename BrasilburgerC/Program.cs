@@ -32,6 +32,7 @@ builder.Services.AddHttpContextAccessor();
 
 // Enregistrement des services avec leurs interfaces
 builder.Services.AddScoped<IAuthService, AuthServiceImpl>();
+builder.Services.AddScoped<ICatalogueService, CatalogueServiceImpl>();
 
 var app = builder.Build();
 
