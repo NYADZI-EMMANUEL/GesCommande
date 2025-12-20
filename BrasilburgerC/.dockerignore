@@ -1,13 +1,29 @@
-# Créez un fichier .dockerignore
-echo "bin/
+# Fichiers de build
+bin/
 obj/
-.git/
-.vs/
+publish/
+
+# Fichiers de développement
 *.user
 *.suo
+*.userprefs
+.vs/
 .vscode/
-Dockerfile*
-docker-compose*
-.env
+.idea/
+
+# Fichiers de configuration sensibles
+appsettings.Development.json
+*.env
+
+# Docker
+.dockerignore
+Dockerfile.local
+
+# Git
+.git/
+.gitignore
+
+# Autres
 *.db
-*.log" > .dockerignore
+*.log
+*.tmp
