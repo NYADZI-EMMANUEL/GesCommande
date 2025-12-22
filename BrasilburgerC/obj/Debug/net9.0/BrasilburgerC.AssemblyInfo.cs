@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BrasilburgerC")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+77ebbb27ae834f2890d11961fc4b1b77e82d4efd")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4a700b535c89a4088e836a9e4c20344a77591328")]
 [assembly: System.Reflection.AssemblyProductAttribute("BrasilburgerC")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BrasilburgerC")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

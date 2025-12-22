@@ -1,0 +1,11 @@
+bin/
+obj/
+dist/
+publish/
+*.db
+*.log
+*.tmp
+Dockerfile
+.dockerignore
+.git/
+.gitignore
