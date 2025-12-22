@@ -8,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 // Récupérer la ConnectionString
 var connectionString = builder.Configuration.GetConnectionString("NeonConnection");
 
@@ -32,7 +35,6 @@ builder.Services.AddHttpContextAccessor();
 
 // Enregistrement des services avec leurs interfaces
 builder.Services.AddScoped<IAuthService, AuthServiceImpl>();
-builder.Services.AddScoped<ICatalogueService, CatalogueServiceImpl>();
 builder.Services.AddScoped<ICatalogueService, CatalogueServiceImpl>();
 builder.Services.AddScoped<IPanierService, PanierServiceImpl>();
 builder.Services.AddScoped<ICommandeService, CommandeServiceImpl>();
@@ -60,5 +62,4 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Auth}/{action=Login}/{id?}");
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-app.Run($"http://0.0.0.0:{port}");
+app.Run();

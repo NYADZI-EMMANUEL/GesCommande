@@ -1,12 +1,12 @@
 services:
   - type: web
-    name: monappmvc
-    env: docker
-    region: frankfurt
+    name: brasilburger-mvc
+    runtime: dotnet
     plan: free
-    branch: feature/csharp-mvc  # Remplacez par VOTRE nom de branche
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
+    rootDirectory: BrasilburgerC  # IMPORTANT : indique le sous-dossier
+    buildCommand: dotnet publish -c Release -o ./publish
+    startCommand: cd ./publish && dotnet BrasilburgerC.dll --urls=http://0.0.0.0:$PORT
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
+    autoDeploy: true
