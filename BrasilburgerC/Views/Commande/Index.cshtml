@@ -1,0 +1,199 @@
+@model List<BrasilburgerC.Models.Commande>
+@{
+    ViewData["Title"] = "Commandes";
+    var commandesEnCours = Model.Where(c => c.Statut == "En_attente" || c.Statut == "En_preparation" || c.Statut == "Pret").ToList();
+    var historique = Model.Where(c => c.Statut == "Terminer" || c.Statut == "Annuler").ToList();
+}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Brasil Burger</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="d-flex" style="gap:5%;">
+        <!-- Sidebar -->
+        <div class="bg-warning text-white" style="height: 100%; width: 15%; position: fixed; top: 0; left: 0;padding-left:10px; padding-top:10px;padding-bottom:10px;padding-right:0;background: linear-gradient(180deg, #FFA629 0%, #000000 100%);">
+            <div class="text-center mb-4">
+                <img src="https://res.cloudinary.com/dx2imkeka/image/upload/v1766200802/logo_brasil_burger_1_atsto9.png" alt="Logo" class="rounded-circle mb-3">
+            </div>
+            
+            <nav class="nav flex-column">
+                <a class="nav-link text-white mb-2" asp-controller="Catalogue" asp-action="Index" style="border-radius: 20px 0 0 20px; padding-left:10px; padding-top:10px; padding-bottom:10px; padding-right:0;">
+                    <span><i class="bi bi-newspaper text-white"></i></span> Catalogue
+                </a>
+                <a class="nav-link text-white mb-2 p-3" asp-controller="Panier" asp-action="Index" style="border-radius: 20px 0 0 20px; padding-left:10px; padding-top:10px; padding-bottom:10px; padding-right:0;">
+                    <span><i class="bi bi-bag-fill text-white"></i></span> Panier
+                </a>
+                <a class="nav-link text-white bg-dark mb-2 p-3" asp-controller="Commande" asp-action="Index" style="border-radius: 20px 0 0 20px; padding-left:10px; padding-top:10px; padding-bottom:10px; padding-right:0;">
+                    <span><i class="bi bi-clipboard-fill text-white"></i></span> Commades
+                </a>
+                <a class="nav-link text-white p-3" href="#">
+                    <span><i class="bi bi-person-fill text-white"></i></span> @ViewBag.UserPrenom @ViewBag.UserNom
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-grow-1 p-4" style="width: 80%; margin-left:17%; margin-top:20px;">
+            <h2 class="mb-4">Commandes</h2>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- Suivi commande (En cours) -->
+            <h5 class="mb-3">Suivre commande</h5>
+            <div class="card border-0 shadow-sm mb-5">
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Date</th>
+                                <th>Nbre de produit</th>
+                                <th>Montant</th>
+                                <th>Statut</th>
+                                <th>Mode de retrait</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (commandesEnCours.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">
+                                        Aucune commande en cours
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var commande in commandesEnCours)
+                                {
+                                    <tr>
+                                        <td>@commande.Id</td>
+                                        <td>@commande.DateCom.ToString("dd/MM/yyyy")</td>
+                                        <td>@commande.CommandeProduits?.Sum(cp => cp.Quantite)</td>
+                                        <td>@commande.TotalPrix fcfa</td>
+                                        <td>
+                                            @if (commande.Statut == "En_attente")
+                                            {
+                                                <span class="text-secondary">En attente</span>
+                                            }
+                                            else if (commande.Statut == "En_preparation")
+                                            {
+                                                <span class="text-warning">En préparation</span>
+                                            }
+                                            else if (commande.Statut == "Pret")
+                                            {
+                                                <span class="text-info">Prêt</span>
+                                            }
+                                        </td>
+                                        <td>@commande.Mode.Replace("_", " ")</td>
+                                        <td>
+                                            <a asp-action="Details" asp-route-id="@commande.Id" class="text-success">
+                                                <i class="bi bi-eye-fill"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Historique des commandes -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">Historiques des commande</h5>
+                <div class="d-flex gap-2">
+                    <input type="date" class="form-control" style="width: 200px;">
+                    <button class="btn btn-warning text-white">
+                        <i class="bi bi-funnel"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Date</th>
+                                <th>Nbre de produit</th>
+                                <th>Montant</th>
+                                <th>Statut</th>
+                                <th>Mode de retrait</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (historique.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">
+                                        Aucune commande dans l'historique
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var commande in historique)
+                                {
+                                    <tr>
+                                        <td>@commande.Id</td>
+                                        <td>@commande.DateCom.ToString("dd/MM/yyyy")</td>
+                                        <td>@commande.CommandeProduits?.Sum(cp => cp.Quantite)</td>
+                                        <td>@commande.TotalPrix fcfa</td>
+                                        <td>
+                                            @if (commande.Statut == "Terminer")
+                                            {
+                                                <span class="text-success">Terminée</span>
+                                            }
+                                            else if (commande.Statut == "Annuler")
+                                            {
+                                                <span class="text-danger">Annulée</span>
+                                            }
+                                        </td>
+                                        <td>@commande.Mode.Replace("_", " ")</td>
+                                        <td>
+                                            <a asp-action="Details" asp-route-id="@commande.Id" class="text-success">
+                                                <i class="bi bi-eye-fill"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            @if (historique.Count > 10)
+            {
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item"><a class="page-link" href="#">Précédent</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Suivant</a></li>
+                    </ul>
+                </nav>
+            }
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

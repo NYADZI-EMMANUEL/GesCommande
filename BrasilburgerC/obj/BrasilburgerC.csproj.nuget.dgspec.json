@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Examen Baila\\BrasilburgerC\\brasilburgerc\\BrasilburgerC.csproj": {}
+    "D:\\Examen Baila\\BrasilburgerC\\BrasilburgerC\\BrasilburgerC.csproj": {}
   },
   "projects": {
-    "D:\\Examen Baila\\BrasilburgerC\\brasilburgerc\\BrasilburgerC.csproj": {
+    "D:\\Examen Baila\\BrasilburgerC\\BrasilburgerC\\BrasilburgerC.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Examen Baila\\BrasilburgerC\\brasilburgerc\\BrasilburgerC.csproj",
+        "projectUniqueName": "D:\\Examen Baila\\BrasilburgerC\\BrasilburgerC\\BrasilburgerC.csproj",
         "projectName": "BrasilburgerC",
-        "projectPath": "D:\\Examen Baila\\BrasilburgerC\\brasilburgerc\\BrasilburgerC.csproj",
+        "projectPath": "D:\\Examen Baila\\BrasilburgerC\\BrasilburgerC\\BrasilburgerC.csproj",
         "packagesPath": "C:\\Users\\nyadz\\.nuget\\packages\\",
-        "outputPath": "D:\\Examen Baila\\BrasilburgerC\\brasilburgerc\\obj\\",
+        "outputPath": "D:\\Examen Baila\\BrasilburgerC\\BrasilburgerC\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\nyadz\\AppData\\Roaming\\NuGet\\NuGet.Config"

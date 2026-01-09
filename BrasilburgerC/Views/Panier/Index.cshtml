@@ -2,6 +2,11 @@
 @{
     ViewData["Title"] = "Panier";
     var complements = ViewBag.Complements as List<BrasilburgerC.Models.Complement>;
+    var zones = ViewBag.Zones as List<BrasilburgerC.Models.Zone>;
+    var total = (decimal)ViewBag.Total;
+    var fraisLivraison = (decimal)ViewBag.FraisLivraison;
+    var totalFinal = (decimal)ViewBag.TotalFinal;
+    var selectedZoneId = ViewBag.SelectedZoneId as int?;
 }
 
 <!DOCTYPE html>
@@ -12,6 +17,23 @@
     <title>@ViewData["Title"] - Brasil Burger</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .complement-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: background-color 0.2s;
+        }
+        .complement-item:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
 </head>
 <body>
     <div class="d-flex" style="gap:5%;">
@@ -43,12 +65,14 @@
 
             @if (Model.Count == 0)
             {
-                <div class="alert alert-info text-center">
-                    <i class="bi bi-cart-x fs-1"></i>
-                    <p class="mt-3">Votre panier est vide</p>
-                    <a asp-controller="Catalogue" asp-action="Index" class="btn btn-warning text-white">
-                        Voir le catalogue
-                    </a>
+                <div class="card border-0 shadow-sm" style="background-color: #d1ecf1;">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-cart-x" style="font-size: 80px; color: #0c5460;"></i>
+                        <p class="mt-3 fs-5" style="color: #0c5460;">Votre panier est vide</p>
+                        <a asp-controller="Catalogue" asp-action="Index" class="btn btn-warning text-white mt-3 px-4">
+                            Voir le catalogue
+                        </a>
+                    </div>
                 </div>
             }
             else
@@ -61,95 +85,182 @@
                     </div>
                 }
 
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
                 <div class="card border-0 shadow-sm">
-                    <div class="card-body p-4">
-                        @foreach (var item in Model)
-                        {
-                            <div class="row mb-4 pb-4 border-bottom">
-                                <div class="col-md-2">
-                                    <img src="@item.Image" alt="@item.Nom" class="img-fluid rounded" style="height: 100px; object-fit: cover;">
-                                </div>
-
-                                <div class="col-md-6">
-                                    <h5 class="fw-bold">@item.Nom</h5>
-                                    <p class="text-warning fw-bold mb-2">@item.Prix fcfa</p>
-
-                                    <!-- Quantité -->
-                                    <form method="post" asp-action="UpdateQuantite" class="d-inline">
-                                        <input type="hidden" name="panierItemId" value="@item.ProduitId" />
-                                        <div class="input-group" style="width: 120px;">
-                                            <button type="submit" name="quantite" value="@(item.Quantite - 1)" class="btn btn-outline-secondary btn-sm">-</button>
-                                            <input type="text" class="form-control form-control-sm text-center" value="@item.Quantite" readonly>
-                                            <button type="submit" name="quantite" value="@(item.Quantite + 1)" class="btn btn-outline-secondary btn-sm">+</button>
-                                        </div>
-                                    </form>
-
-                                    <!-- Dropdown Compléments -->
-                                    @if (item.Type == "Burger" || item.Type == "Menu")
-                                    {
-                                        <div class="mt-3">
-                                            <form method="post" asp-action="AjouterComplement" class="d-flex align-items-center gap-2">
+                    <div class="card-body p-5">
+                        <!-- Formulaire pour ajouter des compléments -->
+                        <form method="post" asp-action="AjouterComplements" asp-controller="Panier" class="mb-4">
+                            <input type="hidden" name="zoneId" value="@selectedZoneId" />
+                            
+                            <!-- Liste des produits du panier -->
+                            @foreach (var item in Model)
+                            {
+                                <div class="row mb-4 align-items-center">
+                                    <div class="col-md-2">
+                                        <img src="@item.Image" alt="@item.Nom" class="img-fluid rounded" style="max-height: 100px; object-fit: cover;">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5 class="mb-1">@item.Nom</h5>
+                                        <p class="text-warning fw-bold mb-0">@item.Prix fcfa</p>
+                                    </div>
+                                    <div class="col-md-2 text-center">
+                                        <div class="d-flex align-items-center justify-content-center gap-2">
+                                            <form method="post" asp-action="Supprimer" class="d-inline">
                                                 <input type="hidden" name="panierItemId" value="@item.ProduitId" />
-                                                <select name="complementId" class="form-select form-select-sm" style="width: 200px;">
-                                                    <option selected disabled>Choisir complément</option>
+                                                <button type="submit" class="btn btn-danger btn-sm rounded-circle" style="width: 35px; height: 35px; padding: 0;">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                            <div class="d-flex align-items-center gap-1">
+                                                <form method="post" asp-action="UpdateQuantite" class="d-inline">
+                                                    <input type="hidden" name="panierItemId" value="@item.ProduitId" />
+                                                    <button type="submit" name="quantite" value="@(item.Quantite - 1)" class="btn btn-outline-secondary btn-sm">-</button>
+                                                </form>
+                                                <div class="border px-3 py-1 rounded mx-1">
+                                                    <span class="fw-bold">@item.Quantite</span>
+                                                </div>
+                                                <form method="post" asp-action="UpdateQuantite" class="d-inline">
+                                                    <input type="hidden" name="panierItemId" value="@item.ProduitId" />
+                                                    <button type="submit" name="quantite" value="@(item.Quantite + 1)" class="btn btn-outline-secondary btn-sm">+</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <!-- Checkboxes pour les compléments -->
+                                        @if (item.Type == "Burger" || item.Type == "Menu")
+                                        {
+                                            <details class="mb-2">
+                                                <summary class="btn btn-outline-secondary w-100 text-start">
+                                                    Choisir complément(s)
+                                                </summary>
+                                                <div class="mt-2" style="max-height: 200px; overflow-y: auto;">
                                                     @foreach (var comp in complements ?? new List<BrasilburgerC.Models.Complement>())
                                                     {
-                                                        <option value="@comp.Id">@comp.Nom - @comp.Prix fcfa</option>
+                                                        <div class="complement-item d-flex align-items-center">
+                                                            <input type="checkbox" name="complementIds" value="@comp.Id" class="checkbox-custom me-3" />
+                                                            <label class="mb-0">@comp.Nom - @comp.Prix fcfa</label>
+                                                        </div>
                                                     }
-                                                </select>
-                                                <button type="submit" class="btn btn-sm btn-warning text-white">Ajouter</button>
-                                            </form>
-                                        </div>
-
-                                        @if (item.Complements.Count > 0)
-                                        {
-                                            <div class="mt-2">
-                                                <small class="text-muted">Compléments ajoutés:</small>
-                                                <ul class="list-unstyled ms-3">
-                                                    @foreach (var comp in item.Complements)
-                                                    {
-                                                        <li class="small">• @comp.Nom (@comp.Quantite) - @comp.Prix fcfa</li>
-                                                    }
-                                                </ul>
-                                            </div>
+                                                </div>
+                                            </details>
                                         }
-                                    }
+                                    </div>
                                 </div>
+                                <hr />
+                            }
 
-                                <div class="col-md-3 text-end">
-                                    <p class="fw-bold fs-5 text-warning">@item.SousTotal fcfa</p>
-                                    <form method="post" asp-action="Supprimer">
-                                        <input type="hidden" name="panierItemId" value="@item.ProduitId" />
-                                        <button type="submit" class="btn btn-sm btn-danger">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                            <!-- Bouton pour ajouter les compléments sélectionnés -->
+                            <div class="text-end mb-4">
+                                <button type="submit" class="btn btn-warning text-white">
+                                    <i class="bi bi-plus-circle"></i> Ajouter les compléments sélectionnés
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Formulaire de validation de commande -->
+                        <form method="post" asp-action="Valider" asp-controller="Panier">
+
+                            <div class="row mt-5">
+                                <!-- Mode de réception -->
+                                <div class="col-md-6">
+                                    <h5 class="mb-3">Mode de reception</h5>
+                                    
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="radio" name="modeReception" id="surPlace" value="Sur_place" required>
+                                        <label class="form-check-label" for="surPlace">
+                                            sur place
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="radio" name="modeReception" id="emporter" value="Emporter">
+                                        <label class="form-check-label" for="emporter">
+                                            emporter
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="radio" name="modeReception" id="livraison" value="Livraison">
+                                        <label class="form-check-label" for="livraison">
+                                            Livraison
+                                        </label>
+                                    </div>
+
+                                    <!-- Zone de livraison (avec rechargement auto) -->
+                                    <details class="mb-3" @(selectedZoneId != null ? "open" : "")>
+                                        <summary class="btn btn-outline-secondary w-100 text-start">
+                                            Livraison, choisir la zone @(selectedZoneId != null ? $"(Frais: {fraisLivraison} fcfa)" : "")
+                                        </summary>
+                                        <div class="mt-2" style="max-height: 200px; overflow-y: auto;">
+                                            @foreach (var zone in zones ?? new List<BrasilburgerC.Models.Zone>())
+                                            {
+                                                <div class="form-check mb-2">
+                                                    <input class="form-check-input" 
+                                                           type="radio" 
+                                                           name="zoneId" 
+                                                           id="zone_@zone.Id" 
+                                                           value="@zone.Id"
+                                                           @(selectedZoneId == zone.Id ? "checked" : "")
+                                                           onchange="this.form.submit()">
+                                                    <label class="form-check-label" for="zone_@zone.Id">
+                                                        <strong>@zone.Nom</strong> - @zone.Quartiers (@zone.Prix fcfa)
+                                                    </label>
+                                                </div>
+                                            }
+                                        </div>
+                                    </details>
+
+                                    <!-- Form invisible pour rechargement automatique -->
+                                    <form method="get" asp-action="Index" style="display:none;" id="zoneForm">
+                                        <input type="hidden" name="zoneId" id="zoneIdInput" />
                                     </form>
+
+                                    <input type="text" name="adresseLivraison" class="form-control" placeholder="Entrer le quartier ou votre numéro de table">
+                                </div>
+
+                                <!-- Paiement -->
+                                <div class="col-md-6">
+                                    <h5 class="mb-3">Paiement</h5>
+
+                                    <div class="form-check mb-4">
+                                        <input class="form-check-input" type="radio" name="modePaiement" id="wave" value="Wave" required>
+                                        <label class="form-check-label d-flex align-items-center gap-2" for="wave">
+                                            <img src="https://res.cloudinary.com/dx2imkeka/image/upload/v1766421843/Rectangle_22_c6bygv.png" alt="Wave" style="height: 30px;">
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check mb-4">
+                                        <input class="form-check-input" type="radio" name="modePaiement" id="om" value="OM">
+                                        <label class="form-check-label d-flex align-items-center gap-2" for="om">
+                                            <img src="https://res.cloudinary.com/dx2imkeka/image/upload/v1766421835/Rectangle_23_uvc1hz.png" alt="Orange Money" style="height: 30px;">
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
-                        }
 
-                        <!-- Total -->
-                        <div class="row mt-4">
-                            <div class="col-md-12 text-end">
-                                <h4>Total : <span class="text-warning fw-bold">@ViewBag.Total fcfa</span></h4>
-                            </div>
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="row mt-4">
-                            <div class="col-md-6">
-                                <form method="post" asp-action="Vider">
-                                    <button type="submit" class="btn btn-outline-danger">
-                                        <i class="bi bi-trash"></i> Vider le panier
+                            <!-- Total et bouton Commander -->
+                            <div class="row mt-5">
+                                <div class="col-md-6">
+                                    <p class="mb-2">Sous-total : <span class="fw-bold">@total fcfa</span></p>
+                                    <p class="mb-2">Frais de livraison : <span class="fw-bold">@fraisLivraison fcfa</span></p>
+                                    <h4>Total : <span class="text-warning fw-bold">@totalFinal fcfa</span></h4>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <input type="hidden" name="zoneId" value="@selectedZoneId" />
+                                    <button type="submit" class="btn btn-lg text-white px-5" style="background: linear-gradient(90deg, #FFA629 0%, #8B4513 100%); border: none; border-radius: 50px;">
+                                        Commander
                                     </button>
-                                </form>
+                                </div>
                             </div>
-                            <div class="col-md-6 text-end">
-                                <a asp-controller="Commande" asp-action="Create" class="btn btn-warning btn-lg text-white px-5">
-                                    Commander <i class="bi bi-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             }
@@ -157,5 +268,14 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Soumission automatique du formulaire quand une zone est sélectionnée
+        document.querySelectorAll('input[name="zoneId"]').forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                document.getElementById('zoneIdInput').value = this.value;
+                document.getElementById('zoneForm').submit();
+            });
+        });
+    </script>
 </body>
 </html>

@@ -2,7 +2,6 @@ using BrasilburgerC.Data;
 using BrasilburgerC.Models;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace BrasilburgerC.Services.Impl
 {
     public class CommandeServiceImpl : ICommandeService
@@ -35,7 +34,7 @@ namespace BrasilburgerC.Services.Impl
             // Créer les lignes commande_produits
             foreach (var item in panierItems)
             {
-                // Ajouter le produit principal (burger ou menu)
+                // Ajouter le produit principal (burger, menu ou complement)
                 var commandeProduit = new CommandeProduit
                 {
                     CommandeId = commande.Id,
@@ -48,7 +47,7 @@ namespace BrasilburgerC.Services.Impl
 
                 _context.CommandeProduits.Add(commandeProduit);
 
-                // Ajouter les compléments
+                // Ajouter les compléments de ce produit
                 foreach (var complement in item.Complements)
                 {
                     var commandeComplement = new CommandeProduit
@@ -65,53 +64,61 @@ namespace BrasilburgerC.Services.Impl
 
             _context.SaveChanges();
 
+            // Créer le paiement
+            var paiement = new Paiement
+            {
+                CommandeId = commande.Id,
+                Date = DateTime.UtcNow,
+                Montant = montantTotal,
+                TypePaiement = typePaiement
+            };
+
+            _context.Paiements.Add(paiement);
+            _context.SaveChanges();
+
             return commande;
         }
 
-        public List<Commande> GetCommandesClient(int clientId)
+        public List<Commande> GetCommandesByClient(int clientId)
         {
             return _context.Commandes
-                .Include(c => c.CommandeProduits)
                 .Include(c => c.Zone)
-                .Include(c => c.Paiement)
-                .Where(c => c.ClientId == clientId)
-                .OrderByDescending(c => c.DateCom)
-                .ToList();
-        }
-
-        public List<Commande> GetCommandesEnCoursClient(int clientId)
-        {
-            return _context.Commandes
-                .Include(c => c.CommandeProduits)
-                .Include(c => c.Paiement)
-                .Where(c => c.ClientId == clientId && 
-                           (c.Statut == "En_attente" || c.Statut == "En_preparation" || c.Statut == "Pret"))
-                .OrderByDescending(c => c.DateCom)
-                .ToList();
-        }
-
-        public List<Commande> GetCommandesTermineesClient(int clientId)
-        {
-            return _context.Commandes
-                .Include(c => c.CommandeProduits)
-                .Include(c => c.Paiement)
-                .Where(c => c.ClientId == clientId && c.Statut == "Terminer")
-                .OrderByDescending(c => c.DateCom)
-                .ToList();
-        }
-
-        public Commande? GetCommandeById(int id)
-        {
-            return _context.Commandes
                 .Include(c => c.CommandeProduits!)
                     .ThenInclude(cp => cp.Burger)
                 .Include(c => c.CommandeProduits!)
                     .ThenInclude(cp => cp.Menu)
                 .Include(c => c.CommandeProduits!)
                     .ThenInclude(cp => cp.Complement)
-                .Include(c => c.Zone)
                 .Include(c => c.Paiement)
-                .FirstOrDefault(c => c.Id == id);
+                .Where(c => c.ClientId == clientId)
+                .OrderByDescending(c => c.DateCom)
+                .ToList();
+        }
+
+        public Commande? GetCommandeById(int commandeId)
+        {
+            return _context.Commandes
+                .Include(c => c.Zone)
+                .Include(c => c.CommandeProduits!)
+                    .ThenInclude(cp => cp.Burger)
+                .Include(c => c.CommandeProduits!)
+                    .ThenInclude(cp => cp.Menu)
+                .Include(c => c.CommandeProduits!)
+                    .ThenInclude(cp => cp.Complement)
+                .Include(c => c.Paiement)
+                .FirstOrDefault(c => c.Id == commandeId);
+        }
+
+        public List<Zone> GetAllZones()
+        {
+            return _context.Zones
+                .OrderBy(z => z.Nom)
+                .ToList();
+        }
+
+        public Zone? GetZoneById(int zoneId)
+        {
+            return _context.Zones.FirstOrDefault(z => z.Id == zoneId);
         }
     }
 }

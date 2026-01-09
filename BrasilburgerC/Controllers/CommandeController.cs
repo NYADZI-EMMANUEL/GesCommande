@@ -1,29 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
 using BrasilburgerC.Services;
-using BrasilburgerC.Data;
+using BrasilburgerC.Models;
 
 namespace BrasilburgerC.Controllers
 {
     public class CommandeController : Controller
     {
-        private readonly ICommandeService _commandeService;
-        private readonly IPaiementService _paiementService;
         private readonly IPanierService _panierService;
         private readonly ICatalogueService _catalogueService;
-        private readonly BrasilburgerCDbContext _context;
+        private readonly ICommandeService _commandeService;
 
-        public CommandeController(
-            ICommandeService commandeService,
-            IPaiementService paiementService,
-            IPanierService panierService,
-            ICatalogueService catalogueService,
-            BrasilburgerCDbContext context)
+        public CommandeController(IPanierService panierService, ICatalogueService catalogueService, ICommandeService commandeService)
         {
-            _commandeService = commandeService;
-            _paiementService = paiementService;
             _panierService = panierService;
             _catalogueService = catalogueService;
-            _context = context;
+            _commandeService = commandeService;
         }
 
         private string GetSessionId()
@@ -32,7 +23,7 @@ namespace BrasilburgerC.Controllers
             return userId?.ToString() ?? HttpContext.Session.Id;
         }
 
-        // GET: Commande/Create (Page de finalisation)
+        // GET: Commande/Create (Page de validation)
         public IActionResult Create()
         {
             var userId = HttpContext.Session.GetInt32("UserId");
@@ -46,13 +37,13 @@ namespace BrasilburgerC.Controllers
 
             if (panier.Count == 0)
             {
-                TempData["ErrorMessage"] = "Votre panier est vide !";
+                TempData["ErrorMessage"] = "Votre panier est vide";
                 return RedirectToAction("Index", "Panier");
             }
 
             var total = _panierService.CalculerTotal(sessionId);
             var complements = _catalogueService.GetAllComplements();
-            var zones = _context.Zones.OrderBy(z => z.Nom).ToList();
+            var zones = _commandeService.GetAllZones();
 
             ViewBag.Total = total;
             ViewBag.Panier = panier;
@@ -64,9 +55,9 @@ namespace BrasilburgerC.Controllers
             return View();
         }
 
-        // POST: Commande/Valider
+        // POST: Commande/Create (Validation de la commande)
         [HttpPost]
-        public IActionResult Valider(string mode, string? adresse, int? zoneId, string typePaiement)
+        public IActionResult Create(string modeReception, int? zoneId, string? adresseLivraison, string modePaiement, List<int>? complementIds)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
@@ -74,77 +65,91 @@ namespace BrasilburgerC.Controllers
                 return RedirectToAction("Login", "Auth");
             }
 
-            // Validation
-            if (string.IsNullOrEmpty(mode))
-            {
-                TempData["ErrorMessage"] = "Veuillez choisir un mode de réception !";
-                return RedirectToAction("Create");
-            }
-
-            if (mode == "Livraison" && (zoneId == null || string.IsNullOrEmpty(adresse)))
-            {
-                TempData["ErrorMessage"] = "Veuillez choisir une zone et entrer votre adresse pour la livraison !";
-                return RedirectToAction("Create");
-            }
-
-            if (string.IsNullOrEmpty(typePaiement))
-            {
-                TempData["ErrorMessage"] = "Veuillez choisir un mode de paiement !";
-                return RedirectToAction("Create");
-            }
-
             var sessionId = GetSessionId();
             var panier = _panierService.GetPanier(sessionId);
 
             if (panier.Count == 0)
             {
-                TempData["ErrorMessage"] = "Votre panier est vide !";
+                TempData["ErrorMessage"] = "Votre panier est vide";
                 return RedirectToAction("Index", "Panier");
             }
 
-            var total = _panierService.CalculerTotal(sessionId);
-
-            // Ajouter frais de livraison si applicable
-            if (mode == "Livraison" && zoneId != null)
+            // Validation
+            if (string.IsNullOrEmpty(modeReception))
             {
-                var zone = _context.Zones.Find(zoneId.Value);
+                TempData["ErrorMessage"] = "Veuillez choisir un mode de réception";
+                return RedirectToAction("Create");
+            }
+
+            if (modeReception == "Livraison" && (zoneId == null || string.IsNullOrEmpty(adresseLivraison)))
+            {
+                TempData["ErrorMessage"] = "Veuillez choisir une zone et entrer votre adresse pour la livraison";
+                return RedirectToAction("Create");
+            }
+
+            if (string.IsNullOrEmpty(modePaiement))
+            {
+                TempData["ErrorMessage"] = "Veuillez choisir un mode de paiement";
+                return RedirectToAction("Create");
+            }
+
+            // Ajouter les compléments sélectionnés au panier
+            if (complementIds != null && complementIds.Count > 0)
+            {
+                foreach (var complementId in complementIds)
+                {
+                    var complement = _catalogueService.GetComplementById(complementId);
+                    if (complement != null)
+                    {
+                        var complementItem = new PanierItem
+                        {
+                            ProduitId = complement.Id,
+                            Type = "Complement",
+                            Nom = complement.Nom,
+                            Prix = complement.Prix,
+                            Image = complement.Image,
+                            Quantite = 1
+                        };
+                        _panierService.AjouterAuPanier(sessionId, complementItem);
+                    }
+                }
+
+                // Récupérer le panier mis à jour
+                panier = _panierService.GetPanier(sessionId);
+            }
+
+            // Calculer le total avec frais de livraison
+            decimal totalPanier = _panierService.CalculerTotal(sessionId);
+            decimal fraisLivraison = 0;
+
+            if (modeReception == "Livraison" && zoneId != null)
+            {
+                var zone = _commandeService.GetZoneById(zoneId.Value);
                 if (zone != null)
                 {
-                    total += zone.Prix;
+                    fraisLivraison = zone.Prix;
                 }
             }
 
-            // Créer la commande
-            var commande = _commandeService.CreerCommande(
+            decimal montantTotal = totalPanier + fraisLivraison;
+
+            // Créer la commande en base de données
+            var commandeId = _commandeService.CreerCommande(
                 userId.Value,
                 panier,
-                mode,
-                mode == "Livraison" ? adresse : null,
-                mode == "Livraison" ? zoneId : null,
-                typePaiement,
-                total
+                modeReception,
+                adresseLivraison,
+                zoneId,
+                modePaiement,
+                montantTotal
             );
-
-            if (commande == null)
-            {
-                TempData["ErrorMessage"] = "Erreur lors de la création de la commande !";
-                return RedirectToAction("Create");
-            }
-
-            // Créer le paiement
-            var paiement = _paiementService.CreerPaiement(commande.Id, total, typePaiement);
-
-            if (paiement == null)
-            {
-                TempData["ErrorMessage"] = "Erreur lors de la création du paiement !";
-                return RedirectToAction("Create");
-            }
 
             // Vider le panier
             _panierService.ViderPanier(sessionId);
-
-            TempData["SuccessMessage"] = "Commande validée avec succès !";
-            return RedirectToAction("Index");
+            
+            TempData["SuccessMessage"] = $"Commande #{commandeId} validée avec succès ! Montant total : {montantTotal} fcfa";
+            
+            return RedirectToAction("Index", "Commande");
         }
 
         // GET: Commande/Index (Liste des commandes)
@@ -156,15 +161,12 @@ namespace BrasilburgerC.Controllers
                 return RedirectToAction("Login", "Auth");
             }
 
-            var commandesEnCours = _commandeService.GetCommandesEnCoursClient(userId.Value);
-            var commandesTerminees = _commandeService.GetCommandesTermineesClient(userId.Value);
+            var commandes = _commandeService.GetCommandesByClient(userId.Value);
 
-            ViewBag.CommandesEnCours = commandesEnCours;
-            ViewBag.CommandesTerminees = commandesTerminees;
             ViewBag.UserNom = HttpContext.Session.GetString("UserNom");
             ViewBag.UserPrenom = HttpContext.Session.GetString("UserPrenom");
 
-            return View();
+            return View(commandes);
         }
 
         // GET: Commande/Details/5

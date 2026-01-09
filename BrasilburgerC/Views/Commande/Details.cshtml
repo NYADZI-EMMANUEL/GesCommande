@@ -1,0 +1,147 @@
+@model BrasilburgerC.Models.Commande
+@{
+    ViewData["Title"] = "Details Commande";
+    var premierProduit = Model.CommandeProduits?.FirstOrDefault();
+    var produit = premierProduit?.Burger ?? (object?)premierProduit?.Menu ?? premierProduit?.Complement;
+}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Brasil Burger</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="d-flex" style="gap:5%;">
+        <!-- Sidebar -->
+        <div class="bg-warning text-white" style="height: 100%; width: 15%; position: fixed; top: 0; left: 0;padding-left:10px; padding-top:10px;padding-bottom:10px;padding-right:0;background: linear-gradient(180deg, #FFA629 0%, #000000 100%);">
+            <div class="text-center mb-4">
+                <img src="https://res.cloudinary.com/dx2imkeka/image/upload/v1766200802/logo_brasil_burger_1_atsto9.png" alt="Logo" class="rounded-circle mb-3">
+            </div>
+            
+            <nav class="nav flex-column">
+                <a class="nav-link text-white mb-2" asp-controller="Catalogue" asp-action="Index" style="border-radius: 20px 0 0 20px; padding-left:10px; padding-top:10px; padding-bottom:10px; padding-right:0;">
+                    <span><i class="bi bi-newspaper text-white"></i></span> Catalogue
+                </a>
+                <a class="nav-link text-white mb-2 p-3" asp-controller="Panier" asp-action="Index" style="border-radius: 20px 0 0 20px; padding-left:10px; padding-top:10px; padding-bottom:10px; padding-right:0;">
+                    <span><i class="bi bi-bag-fill text-white"></i></span> Panier
+                </a>
+                <a class="nav-link text-white bg-dark mb-2 p-3" asp-controller="Commande" asp-action="Index" style="border-radius: 20px 0 0 20px; padding-left:10px; padding-top:10px; padding-bottom:10px; padding-right:0;">
+                    <span><i class="bi bi-clipboard-fill text-white"></i></span> Commades
+                </a>
+                <a class="nav-link text-white p-3" href="#">
+                    <span><i class="bi bi-person-fill text-white"></i></span> @ViewBag.UserPrenom @ViewBag.UserNom
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-grow-1 p-4" style="width: 80%; margin-left:17%; margin-top:20px;">
+            <div class="mb-4">
+                <a asp-action="Index" class="text-decoration-none text-dark">
+                    <i class="bi bi-arrow-left"></i> <span class="fw-bold">Details Commande</span>
+                </a>
+            </div>
+
+            <!-- Informations produit principal -->
+            @if (produit != null)
+            {
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-2">
+                                @if (premierProduit?.Burger != null)
+                                {
+                                    <img src="@premierProduit.Burger.Image" alt="@premierProduit.Burger.Nom" class="img-fluid rounded" style="max-height: 100px; object-fit: cover;">
+                                }
+                                else if (premierProduit?.Menu != null)
+                                {
+                                    <img src="@premierProduit.Menu.Image" alt="@premierProduit.Menu.Nom" class="img-fluid rounded" style="max-height: 100px; object-fit: cover;">
+                                }
+                                else if (premierProduit?.Complement != null)
+                                {
+                                    <img src="@premierProduit.Complement.Image" alt="@premierProduit.Complement.Nom" class="img-fluid rounded" style="max-height: 100px; object-fit: cover;">
+                                }
+                            </div>
+                            <div class="col-md-10">
+                                <p class="mb-1"><strong>Nom:</strong> 
+                                    @if (premierProduit?.Burger != null)
+                                    {
+                                        @premierProduit.Burger.Nom
+                                    }
+                                    else if (premierProduit?.Menu != null)
+                                    {
+                                        @premierProduit.Menu.Nom
+                                    }
+                                    else if (premierProduit?.Complement != null)
+                                    {
+                                        @premierProduit.Complement.Nom
+                                    }
+                                </p>
+                                <p class="mb-1"><strong>Prix:</strong> <span class="text-warning">@premierProduit?.SousTotal fcfa</span></p>
+                                <p class="mb-0"><strong>Quantité:</strong> @premierProduit?.Quantite</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Détails de la commande -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Date</th>
+                                <th>Nbre de produit</th>
+                                <th>Montant</th>
+                                <th>Statut</th>
+                                <th>Mode de retrait</th>
+                                <th>Paiement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>@Model.Id</td>
+                                <td>@Model.DateCom.ToString("dd/MM/yyyy")</td>
+                                <td>@Model.CommandeProduits?.Sum(cp => cp.Quantite)</td>
+                                <td>@Model.TotalPrix fcfa</td>
+                                <td>
+                                    @if (Model.Statut == "En_attente")
+                                    {
+                                        <span class="text-secondary">En attente</span>
+                                    }
+                                    else if (Model.Statut == "En_preparation")
+                                    {
+                                        <span class="text-warning">En préparation</span>
+                                    }
+                                    else if (Model.Statut == "Pret")
+                                    {
+                                        <span class="text-info">Prêt</span>
+                                    }
+                                    else if (Model.Statut == "Terminer")
+                                    {
+                                        <span class="text-success">Terminée</span>
+                                    }
+                                    else if (Model.Statut == "Annuler")
+                                    {
+                                        <span class="text-danger">Annulée</span>
+                                    }
+                                </td>
+                                <td>@Model.Mode.Replace("_", " ")</td>
+                                <td>@Model.Paiement?.TypePaiement</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

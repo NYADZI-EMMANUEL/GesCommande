@@ -187,3 +187,9 @@ D:\Examen Baila\BrasilburgerC\BrasilburgerC\bin\Debug\net9.0\Npgsql.dll
 D:\Examen Baila\BrasilburgerC\BrasilburgerC\bin\Debug\net9.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
 D:\Examen Baila\BrasilburgerC\BrasilburgerC\obj\Debug\net9.0\compressed\gbs4nyoqpo-pidya6pg9t.gz
 D:\Examen Baila\BrasilburgerC\BrasilburgerC\obj\Debug\net9.0\compressed\rwcf9ailm1-pidya6pg9t.gz
+D:\Examen Baila\BrasilburgerC\BrasilburgerC\bin\Debug\net9.0\dist\web.config
+D:\Examen Baila\BrasilburgerC\BrasilburgerC\bin\Debug\net9.0\dist\appsettings.Development.json
+D:\Examen Baila\BrasilburgerC\BrasilburgerC\bin\Debug\net9.0\dist\appsettings.json
+D:\Examen Baila\BrasilburgerC\BrasilburgerC\bin\Debug\net9.0\dist\BrasilburgerC.deps.json
+D:\Examen Baila\BrasilburgerC\BrasilburgerC\bin\Debug\net9.0\dist\BrasilburgerC.runtimeconfig.json
+D:\Examen Baila\BrasilburgerC\BrasilburgerC\bin\Debug\net9.0\dist\BrasilburgerC.staticwebassets.endpoints.json
